@@ -27,7 +27,7 @@ def setup(bot,storage):
             #await event.respond(str(x))
             id = int(x[3])
             tweet = await TWClient.get_tweet(id=id,expansions=["author_id"],tweet_fields=["created_at","author_id"],user_fields=["name"])
-            await event.respond(str(tweet))
+            #await event.respond(str(tweet))
             text = tweet["data"]["text"]
             await event.reply(tweetid_reply.format(time=tweet["data"]["created_at"],by=x[2],text=text,url=x[0],dname=tweet["includes"]["users"][0]["name"]),link_preview=False)
         for x in user_regex.findall(text + " "):
