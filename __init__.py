@@ -18,7 +18,8 @@ TWClient = tw.AsyncClient(bearer_token=tw_api_bearer,return_type=dict)
 tweetid_regex = re.compile(r"(http(s?)://twitter.com/([a-zA-Z0-9_-]+)/status/([0-9]+))(\?[a-zA-Z0-9%&=]+)?") # .match
 tweetid_reply = "[Tweet Data]({url})\n__Tweeted by__: [{dname}](https://twitter.com/{by})\n__Tweeted at__: {time}\n{text}"
 user_regex = re.compile(r"http(s?)://twitter.com/([a-zA-Z0-9_-]+)/? ") # UNAME @ GP2
-user_reply = "[{dname}](https://twitter.com/{uname}): {description}"
+user_reply = "[{dname}](https://twitter.com/{uname}){verified}\n__Location__: {location}\n__URL__: {url}\n__Description__: {description}"
+nf = "404 Not Found"
 def setup(bot,storage):
     @bot.on(events.NewMessage())
     async def tw_trymatch(event):
@@ -32,12 +33,12 @@ def setup(bot,storage):
             await event.reply(tweetid_reply.format(time=tweet["data"]["created_at"],by=x[2],text=text,url=x[0],dname=tweet["includes"]["users"][0]["name"]),link_preview=False)
         for x in user_regex.findall(text + " "):
             uname = x[1]
-            user = await TWClient.get_user(username=uname,user_fields=["description"])
+            user = (await TWClient.get_user(username=uname,user_fields=["description","location","verified","url"]))["data"]
             #await event.respond(str(user))
-            description = user["data"]["description"]
+            description = user["description"]
             if description == "":
-                description = "__No description__"
-            dname = user["data"]["name"]
-            await event.reply(user_reply.format(dname=dname,uname=uname,description=description),link_preview=False)
+                description = nf
+            dname = user["name"]
+            await event.reply(user_reply.format(dname=dname,uname=uname,description=description,location=user["location"] if "location" in user else nf,verified=" ✅" if user["verified"] else "",url=user["url"] if user["url"] != "" else nf),link_preview=False)
 
 
