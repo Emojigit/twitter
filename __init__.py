@@ -11,9 +11,9 @@ import tweepy.asynchronous as tw
 import config, re
 from tweepy.errors import *
 try:
-    tw_api_key = config.tw_api_key
+    tw_api_bearer = config.tw_api_bearer
 except AttributeError:
-    raise RuntimeError("Missing `tw_api_bearer` in settings.py!")
+    raise RuntimeError("Missing `tw_api_bearer` in config.py!")
 TWClient = tw.AsyncClient(bearer_token=tw_api_bearer,return_type=dict)
 tweetid_regex = re.compile(r"(http(s?)://twitter.com/([a-zA-Z0-9_-]+)/status/([0-9]+))(\?[a-zA-Z0-9%&=]+)?") # .match
 tweetid_reply = "[Tweet Data]({url})\n__Tweeted by__: [{by}](https://twitter.com/{by})\n__Tweeted at__: {time}\n{text}"
